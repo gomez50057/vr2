@@ -40,6 +40,7 @@ function fitText(value, max = 145) {
 export default function RecorridoVR() {
   const containerRef = useRef(null);
   const sceneRef = useRef(null);
+  const audioRef = useRef(null);
   const vrCloseRef = useRef(null);
   const lastActivationRef = useRef({ id: "", time: 0 });
   const [aframeReady, setAframeReady] = useState(false);
@@ -51,6 +52,8 @@ export default function RecorridoVR() {
   const [imageBroken, setImageBroken] = useState(false);
   const [notice, setNotice] = useState("");
   const [cleanView, setCleanView] = useState(false);
+  const [isVrMode, setIsVrMode] = useState(false);
+  const [audioEnabled, setAudioEnabled] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -129,6 +132,26 @@ export default function RecorridoVR() {
 
     return `${position.x.toFixed(2)} ${position.y.toFixed(2)} ${position.z.toFixed(2)}`;
   }, []);
+
+  const playAudio = useCallback(() => {
+    audioRef.current
+      ?.play()
+      .then(() => setAudioEnabled(true))
+      .catch(() => setAudioEnabled(false));
+  }, []);
+
+  const toggleAudio = useCallback(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    if (audio.paused) {
+      playAudio();
+      return;
+    }
+
+    audio.pause();
+    setAudioEnabled(false);
+  }, [playAudio]);
 
   useEffect(() => {
     closeInfo();
@@ -223,8 +246,31 @@ export default function RecorridoVR() {
   }, []);
 
   const enterVr = useCallback(() => {
+    playAudio();
     sceneRef.current?.enterVR?.();
-  }, []);
+  }, [playAudio]);
+
+  useEffect(() => {
+    const scene = sceneRef.current;
+    if (!scene) return undefined;
+
+    const enter = () => {
+      setIsVrMode(true);
+      playAudio();
+    };
+    const exit = () => setIsVrMode(false);
+
+    scene.addEventListener("enter-vr", enter);
+    scene.addEventListener("exit-vr", exit);
+    return () => {
+      scene.removeEventListener("enter-vr", enter);
+      scene.removeEventListener("exit-vr", exit);
+    };
+  }, [aframeReady, playAudio]);
+
+  useEffect(() => {
+    if (isVrMode) playAudio();
+  }, [isVrMode, playAudio]);
 
   useEffect(() => {
     const el = vrCloseRef.current;
@@ -258,6 +304,7 @@ export default function RecorridoVR() {
       className={`${styles.shell} ${cleanView ? styles.cleanView : ""}`}
       onDoubleClick={() => setCleanView((value) => !value)}
     >
+      <audio ref={audioRef} src="/Sudo.mp3" loop preload="auto" />
       <div className={styles.viewer}>
         {aframeReady && currentNode ? (
           <a-scene
@@ -305,7 +352,7 @@ export default function RecorridoVR() {
               <a-entity position={infoPanelPose} face-camera="">
                 <a-plane
                   width="1.72"
-                  height="1"
+                  height="0.92"
                   material="color: #071018; opacity: 0.88; transparent: true; shader: flat"
                 />
                 <a-text
@@ -335,15 +382,15 @@ export default function RecorridoVR() {
                 <a-entity
                   ref={vrCloseRef}
                   className="hotspot"
-                  position="0 -0.36 0.04"
-                  geometry="primitive: circle; radius: 0.16"
+                  position="0 -0.66 0.06"
+                  geometry="primitive: circle; radius: 0.2"
                   material="color: #38bdf8; opacity: 0.95; transparent: true; shader: flat"
                   data-hotspot-id="cerrar-info-vr"
                 >
                   <a-text
                     value="Cerrar"
                     align="center"
-                    width="1"
+                    width="1.15"
                     color="#071018"
                     position="0 -0.025 0.01"
                     material="shader: flat"
@@ -374,6 +421,9 @@ export default function RecorridoVR() {
           <button type="button" onClick={enterVr} disabled={!aframeReady}>
             VR/Cardboard
           </button>
+          <button type="button" onClick={toggleAudio}>
+            {audioEnabled ? "Pausar audio" : "Audio"}
+          </button>
           <button type="button" onClick={() => setCleanView((value) => !value)}>
             {cleanView ? "Mostrar UI" : "Vista limpia"}
           </button>
@@ -390,7 +440,7 @@ export default function RecorridoVR() {
         <SceneMenu nodes={nodes} currentNodeId={currentNode.id} onSelect={changeScene} />
       ) : null}
 
-      <InfoPanel hotspot={infoHotspot} onClose={closeInfo} />
+      {!isVrMode ? <InfoPanel hotspot={infoHotspot} onClose={closeInfo} /> : null}
       <LoadingScreen
         visible={loading || !aframeReady}
         message={!aframeReady ? "Iniciando visor VR" : "Cargando escena"}
