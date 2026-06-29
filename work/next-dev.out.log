@@ -96,3 +96,13 @@
  GET /recorrido-vr 200 in 378ms (next.js: 285ms, application-code: 93ms)
 ✓ Compiled in 118ms
  GET /recorrido-vr 200 in 283ms (next.js: 195ms, application-code: 88ms)
+ GET /recorrido-vr 200 in 246ms (next.js: 33ms, application-code: 213ms)
+ GET /recorrido-vr 200 in 131ms (next.js: 9ms, application-code: 122ms)
+ GET /recorrido-vr 200 in 129ms (next.js: 15ms, application-code: 114ms)
+ GET /recorrido-vr 200 in 487ms (next.js: 181ms, application-code: 306ms)
+ GET /recorrido-vr 200 in 183ms (next.js: 33ms, application-code: 150ms)
+ GET /recorrido-vr 200 in 360ms (next.js: 73ms, application-code: 287ms)
+ GET /recorrido-vr 200 in 982ms (next.js: 546ms, application-code: 437ms)
+ GET /recorrido-vr 200 in 87ms (next.js: 5ms, application-code: 82ms)
+ GET /recorrido-vr 200 in 74ms (next.js: 8ms, application-code: 66ms)
+ GET /recorrido-vr 200 in 56ms (next.js: 7ms, application-code: 49ms)

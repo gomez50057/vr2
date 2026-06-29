@@ -46,6 +46,7 @@ export default function RecorridoVR() {
   const [tour, setTour] = useState(null);
   const [currentNodeId, setCurrentNodeId] = useState("");
   const [infoHotspot, setInfoHotspot] = useState(null);
+  const [infoPanelPose, setInfoPanelPose] = useState(null);
   const [loading, setLoading] = useState(true);
   const [imageBroken, setImageBroken] = useState(false);
   const [notice, setNotice] = useState("");
@@ -110,6 +111,29 @@ export default function RecorridoVR() {
 
   const currentNode = nodesById[currentNodeId] || nodes[0] || null;
 
+  const closeInfo = useCallback(() => {
+    setInfoHotspot(null);
+    setInfoPanelPose(null);
+  }, []);
+
+  const getInfoPanelPose = useCallback(() => {
+    const aframe = window.AFRAME;
+    const camera = sceneRef.current?.camera?.el;
+    if (!aframe || !camera) return "0 1.6 -2.2";
+
+    const position = new aframe.THREE.Vector3();
+    const direction = new aframe.THREE.Vector3();
+    camera.object3D.getWorldPosition(position);
+    camera.object3D.getWorldDirection(direction);
+    position.add(direction.multiplyScalar(2.2));
+
+    return `${position.x.toFixed(2)} ${position.y.toFixed(2)} ${position.z.toFixed(2)}`;
+  }, []);
+
+  useEffect(() => {
+    closeInfo();
+  }, [currentNodeId, closeInfo]);
+
   useEffect(() => {
     if (!currentNode) return undefined;
 
@@ -161,7 +185,6 @@ export default function RecorridoVR() {
   const changeScene = useCallback(
     (nodeId) => {
       if (!nodeId || !nodesById[nodeId] || nodeId === currentNodeId) return;
-      setInfoHotspot(null);
       setCurrentNodeId(nodeId);
     },
     [currentNodeId, nodesById],
@@ -184,9 +207,10 @@ export default function RecorridoVR() {
         return;
       }
 
+      setInfoPanelPose(getInfoPanelPose());
       setInfoHotspot(hotspot);
     },
-    [changeScene],
+    [changeScene, getInfoPanelPose],
   );
 
   const toggleFullscreen = useCallback(() => {
@@ -208,12 +232,12 @@ export default function RecorridoVR() {
 
     const close = (event) => {
       event.stopPropagation();
-      setInfoHotspot(null);
+      closeInfo();
     };
 
     el.addEventListener("click", close);
     return () => el.removeEventListener("click", close);
-  }, [infoHotspot]);
+  }, [closeInfo, infoHotspot]);
 
   if (notice && !currentNode) {
     return (
@@ -275,58 +299,58 @@ export default function RecorridoVR() {
                   animation__fusing="property: scale; startEvents: fusing; easing: easeInQuad; dur: 1500; from: 1 1 1; to: 1.8 1.8 1.8"
                   animation__reset="property: scale; startEvents: mouseleave; dur: 120; to: 1 1 1"
                 />
-                {infoHotspot ? (
-                  <a-entity position="0 0 -2.05">
-                    <a-plane
-                      width="1.72"
-                      height="1"
-                      material="color: #071018; opacity: 0.88; transparent: true; shader: flat"
-                    />
-                    <a-text
-                      value="Punto informativo"
-                      align="center"
-                      width="1.45"
-                      color="#93cde7"
-                      position="0 0.35 0.02"
-                      material="shader: flat"
-                    />
-                    <a-text
-                      value={fitText(infoHotspot.title || infoHotspot.label, 38)}
-                      align="center"
-                      width="1.52"
-                      color="#ffffff"
-                      position="0 0.19 0.02"
-                      material="shader: flat"
-                    />
-                    <a-text
-                      value={fitText(infoHotspot.description, 120)}
-                      align="center"
-                      width="1.42"
-                      color="#dbeafe"
-                      position="0 -0.06 0.02"
-                      material="shader: flat"
-                    />
-                    <a-entity
-                      ref={vrCloseRef}
-                      className="hotspot"
-                      position="0 -0.36 0.04"
-                      geometry="primitive: circle; radius: 0.16"
-                      material="color: #38bdf8; opacity: 0.95; transparent: true; shader: flat"
-                      data-hotspot-id="cerrar-info-vr"
-                    >
-                      <a-text
-                        value="Cerrar"
-                        align="center"
-                        width="1"
-                        color="#071018"
-                        position="0 -0.025 0.01"
-                        material="shader: flat"
-                      />
-                    </a-entity>
-                  </a-entity>
-                ) : null}
               </a-camera>
             </a-entity>
+            {infoHotspot && infoPanelPose ? (
+              <a-entity position={infoPanelPose} face-camera="">
+                <a-plane
+                  width="1.72"
+                  height="1"
+                  material="color: #071018; opacity: 0.88; transparent: true; shader: flat"
+                />
+                <a-text
+                  value="Punto informativo"
+                  align="center"
+                  width="1.45"
+                  color="#93cde7"
+                  position="0 0.35 0.02"
+                  material="shader: flat"
+                />
+                <a-text
+                  value={fitText(infoHotspot.title || infoHotspot.label, 38)}
+                  align="center"
+                  width="1.52"
+                  color="#ffffff"
+                  position="0 0.19 0.02"
+                  material="shader: flat"
+                />
+                <a-text
+                  value={fitText(infoHotspot.description, 120)}
+                  align="center"
+                  width="1.42"
+                  color="#dbeafe"
+                  position="0 -0.06 0.02"
+                  material="shader: flat"
+                />
+                <a-entity
+                  ref={vrCloseRef}
+                  className="hotspot"
+                  position="0 -0.36 0.04"
+                  geometry="primitive: circle; radius: 0.16"
+                  material="color: #38bdf8; opacity: 0.95; transparent: true; shader: flat"
+                  data-hotspot-id="cerrar-info-vr"
+                >
+                  <a-text
+                    value="Cerrar"
+                    align="center"
+                    width="1"
+                    color="#071018"
+                    position="0 -0.025 0.01"
+                    material="shader: flat"
+                  />
+                </a-entity>
+              </a-entity>
+            ) : null}
           </a-scene>
         ) : null}
       </div>
@@ -366,7 +390,7 @@ export default function RecorridoVR() {
         <SceneMenu nodes={nodes} currentNodeId={currentNode.id} onSelect={changeScene} />
       ) : null}
 
-      <InfoPanel hotspot={infoHotspot} onClose={() => setInfoHotspot(null)} />
+      <InfoPanel hotspot={infoHotspot} onClose={closeInfo} />
       <LoadingScreen
         visible={loading || !aframeReady}
         message={!aframeReady ? "Iniciando visor VR" : "Cargando escena"}

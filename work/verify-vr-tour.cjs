@@ -46,8 +46,23 @@ const tour = JSON.parse(fs.readFileSync(path.join(root, "public", "vr", "data", 
   });
   await page.waitForSelector('[role="dialog"]', { timeout: 5000 });
   const infoTitle = await page.locator('[role="dialog"] h2').innerText();
-  await page.getByRole("button", { name: /Cerrar/i }).click();
+  const vrCloseExists = await page.locator('[data-hotspot-id="cerrar-info-vr"]').count();
+  await page.locator('[data-hotspot-id="cerrar-info-vr"]').evaluate((el) => {
+    el.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
+  });
+  await page.waitForSelector('[role="dialog"]', { state: "detached", timeout: 5000 });
+  await page.waitForTimeout(700);
 
+  await page.locator('[data-hotspot-id="info-entrada"]').evaluate((el) => {
+    el.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
+  });
+  await page.waitForSelector('[role="dialog"]', { timeout: 5000 });
+  await page.getByRole("button", { name: /Plaza civica/i }).click();
+  await page.waitForSelector('[role="dialog"]', { state: "detached", timeout: 5000 });
+  const sceneChangeClosedInfo = await page.locator('[role="dialog"]').count() === 0;
+
+  await page.getByRole("button", { name: /Entrada torre de reloj/i }).click();
+  await page.waitForTimeout(500);
   await page.locator('[data-hotspot-id="ir-plaza-civica"]').evaluate((el) => {
     el.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
   });
@@ -61,9 +76,11 @@ const tour = JSON.parse(fs.readFileSync(path.join(root, "public", "vr", "data", 
 
   await browser.close();
 
-  console.log(JSON.stringify({ consoleErrors, results, infoTitle, hotspotNavigationTitle }, null, 2));
+  console.log(JSON.stringify({ consoleErrors, results, infoTitle, vrCloseExists, sceneChangeClosedInfo, hotspotNavigationTitle }, null, 2));
   if (consoleErrors.length) process.exit(1);
   if (results.some((result) => !result.skyUsesAsset)) process.exit(1);
   if (!/Acceso urbano/i.test(infoTitle)) process.exit(1);
+  if (!vrCloseExists) process.exit(1);
+  if (!sceneChangeClosedInfo) process.exit(1);
   if (!/Plaza civica/i.test(hotspotNavigationTitle)) process.exit(1);
 })();
