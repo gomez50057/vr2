@@ -28,6 +28,33 @@ function registerFaceCamera() {
   });
 }
 
+function registerPlaceInFrontOfCamera() {
+  const aframe = window.AFRAME;
+  if (!aframe || aframe.components["place-in-front-of-camera"]) return;
+
+  aframe.registerComponent("place-in-front-of-camera", {
+    schema: {
+      distance: { type: "number", default: 2.2 },
+    },
+    init() {
+      this.position = new aframe.THREE.Vector3();
+      this.direction = new aframe.THREE.Vector3();
+
+      const place = () => {
+        const camera = this.el.sceneEl?.camera;
+        if (!camera) return;
+
+        camera.getWorldPosition(this.position);
+        camera.getWorldDirection(this.direction);
+        this.position.add(this.direction.multiplyScalar(this.data.distance));
+        this.el.object3D.position.copy(this.position);
+      };
+
+      requestAnimationFrame(() => requestAnimationFrame(place));
+    },
+  });
+}
+
 function isUsableTour(data) {
   return data && Array.isArray(data.nodes) && data.nodes.length > 0;
 }
@@ -47,7 +74,6 @@ export default function RecorridoVR() {
   const [tour, setTour] = useState(null);
   const [currentNodeId, setCurrentNodeId] = useState("");
   const [infoHotspot, setInfoHotspot] = useState(null);
-  const [infoPanelPose, setInfoPanelPose] = useState(null);
   const [loading, setLoading] = useState(true);
   const [imageBroken, setImageBroken] = useState(false);
   const [notice, setNotice] = useState("");
@@ -62,6 +88,7 @@ export default function RecorridoVR() {
       .then(() => {
         if (!mounted) return;
         registerFaceCamera();
+        registerPlaceInFrontOfCamera();
         setAframeReady(true);
       })
       .catch(() => {
@@ -116,21 +143,6 @@ export default function RecorridoVR() {
 
   const closeInfo = useCallback(() => {
     setInfoHotspot(null);
-    setInfoPanelPose(null);
-  }, []);
-
-  const getInfoPanelPose = useCallback(() => {
-    const aframe = window.AFRAME;
-    const camera = sceneRef.current?.camera?.el;
-    if (!aframe || !camera) return "0 1.6 -2.2";
-
-    const position = new aframe.THREE.Vector3();
-    const direction = new aframe.THREE.Vector3();
-    camera.object3D.getWorldPosition(position);
-    camera.object3D.getWorldDirection(direction);
-    position.add(direction.multiplyScalar(2.2));
-
-    return `${position.x.toFixed(2)} ${position.y.toFixed(2)} ${position.z.toFixed(2)}`;
   }, []);
 
   const playAudio = useCallback(() => {
@@ -230,10 +242,9 @@ export default function RecorridoVR() {
         return;
       }
 
-      setInfoPanelPose(getInfoPanelPose());
       setInfoHotspot(hotspot);
     },
-    [changeScene, getInfoPanelPose],
+    [changeScene],
   );
 
   const toggleFullscreen = useCallback(() => {
@@ -348,8 +359,12 @@ export default function RecorridoVR() {
                 />
               </a-camera>
             </a-entity>
-            {infoHotspot && infoPanelPose ? (
-              <a-entity position={infoPanelPose} face-camera="">
+            {infoHotspot ? (
+              <a-entity
+                key={infoHotspot.id}
+                place-in-front-of-camera="distance: 2.2"
+                face-camera=""
+              >
                 <a-plane
                   width="1.72"
                   height="0.92"
