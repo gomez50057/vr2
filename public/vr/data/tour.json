@@ -1,0 +1,167 @@
+{
+  "startNode": "entrada",
+  "nodes": [
+    {
+      "id": "entrada",
+      "title": "Entrada principal",
+      "subtitle": "Inicio del recorrido",
+      "panorama": "/vr/renders/nodo-01-entrada.png",
+      "description": "Punto inicial del recorrido virtual urbano.",
+      "initialRotation": -105,
+      "hotspots": [
+        {
+          "id": "ir-calle-principal",
+          "type": "navigation",
+          "label": "Ir a calle principal",
+          "target": "calle-principal",
+          "position": "0 1.6 -4"
+        },
+        {
+          "id": "info-entrada",
+          "type": "info",
+          "label": "Información",
+          "position": "2 1.5 -3",
+          "title": "Acceso urbano",
+          "description": "Este punto funciona como acceso principal del recorrido y marca el inicio de la experiencia.",
+          "image": "/vr/renders/nodo-01-entrada.png"
+        }
+      ]
+    },
+    {
+      "id": "calle-principal",
+      "title": "Calle principal",
+      "subtitle": "Eje de movilidad",
+      "panorama": "/vr/renders/nodo-02-calle-principal.png",
+      "description": "Tramo central con circulación peatonal y vehicular.",
+      "initialRotation": 18,
+      "hotspots": [
+        {
+          "id": "volver-entrada",
+          "type": "navigation",
+          "label": "Volver a entrada",
+          "target": "entrada",
+          "position": "-2 1.5 -3"
+        },
+        {
+          "id": "ir-plaza",
+          "type": "navigation",
+          "label": "Ir a plaza",
+          "target": "plaza",
+          "position": "1.6 1.5 -3.6"
+        },
+        {
+          "id": "info-calle",
+          "type": "info",
+          "label": "Movilidad",
+          "position": "-0.6 2 -4",
+          "title": "Corredor principal",
+          "description": "La calle principal concentra los recorridos peatonales, el mobiliario urbano y las conexiones hacia otros nodos."
+        }
+      ]
+    },
+    {
+      "id": "plaza",
+      "title": "Plaza",
+      "subtitle": "Espacio publico",
+      "panorama": "/vr/renders/nodo-03-plaza.png",
+      "description": "Área abierta para estancia, orientación y encuentro.",
+      "initialRotation": -12,
+      "hotspots": [
+        {
+          "id": "volver-calle",
+          "type": "navigation",
+          "label": "Volver a calle",
+          "target": "calle-principal",
+          "position": "-3 1.4 -2.5"
+        },
+        {
+          "id": "ir-cruce",
+          "type": "navigation",
+          "label": "Ir a cruce urbano",
+          "target": "cruce-urbano",
+          "position": "0 1.5 -4"
+        },
+        {
+          "id": "ir-fachada",
+          "type": "navigation",
+          "label": "Ver fachada",
+          "target": "fachada-institucional",
+          "position": "3 1.4 -2.4"
+        },
+        {
+          "id": "info-plaza",
+          "type": "info",
+          "label": "Plaza",
+          "position": "0 2.1 -3.1",
+          "title": "Nodo de estancia",
+          "description": "La plaza se plantea como un punto de descanso y lectura del conjunto urbano.",
+          "image": "/vr/renders/nodo-03-plaza.png"
+        }
+      ]
+    },
+    {
+      "id": "cruce-urbano",
+      "title": "Cruce urbano",
+      "subtitle": "Intersección",
+      "panorama": "/vr/renders/nodo-04-cruce-urbano.png",
+      "description": "Nodo de decisión entre rutas peatonales y vehiculares.",
+      "initialRotation": 26,
+      "hotspots": [
+        {
+          "id": "volver-plaza",
+          "type": "navigation",
+          "label": "Volver a plaza",
+          "target": "plaza",
+          "position": "-2 1.5 -3"
+        },
+        {
+          "id": "ir-fachada-desde-cruce",
+          "type": "navigation",
+          "label": "Ir a fachada",
+          "target": "fachada-institucional",
+          "position": "2 1.5 -3"
+        },
+        {
+          "id": "info-cruce",
+          "type": "info",
+          "label": "Cruce",
+          "position": "0 2.2 -3.8",
+          "title": "Punto de orientacion",
+          "description": "El cruce urbano ayuda a probar cambios de dirección, lectura espacial y continuidad del recorrido."
+        }
+      ]
+    },
+    {
+      "id": "fachada-institucional",
+      "title": "Fachada institucional",
+      "subtitle": "Cierre del recorrido",
+      "panorama": "/vr/renders/nodo-05-fachada-institucional.png",
+      "description": "Vista frontal del edificio institucional dentro del recorrido.",
+      "initialRotation": -8,
+      "hotspots": [
+        {
+          "id": "volver-plaza-desde-fachada",
+          "type": "navigation",
+          "label": "Volver a plaza",
+          "target": "plaza",
+          "position": "-2.5 1.4 -2.8"
+        },
+        {
+          "id": "volver-cruce",
+          "type": "navigation",
+          "label": "Volver al cruce",
+          "target": "cruce-urbano",
+          "position": "2.5 1.4 -2.8"
+        },
+        {
+          "id": "info-fachada",
+          "type": "info",
+          "label": "Fachada",
+          "position": "0 1.8 -3.2",
+          "title": "Fachada principal",
+          "description": "Este placeholder marca el punto donde después se sustituirá el render definitivo del edificio."
+        }
+      ]
+    }
+  ]
+}

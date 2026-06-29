@@ -1,0 +1,377 @@
+.shell {
+  position: relative;
+  min-height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  background: #080d12;
+  color: #f4f7fb;
+}
+
+.shell::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at center, transparent 42%, rgba(0, 0, 0, 0.18) 100%),
+    linear-gradient(180deg, rgba(4, 8, 12, 0.08), transparent 28%, rgba(4, 8, 12, 0.18));
+}
+
+.viewer,
+.scene {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.scene {
+  background: #0b131b;
+}
+
+.viewer :global(canvas) {
+  display: block;
+}
+
+.viewer :global(.a-enter-vr),
+.viewer :global(.a-enter-ar) {
+  display: none;
+}
+
+.topBar {
+  position: absolute;
+  z-index: 20;
+  top: 18px;
+  left: 18px;
+  right: 18px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  pointer-events: none;
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.titleBlock,
+.controls,
+.sceneMenu,
+.infoPanel,
+.fallbackNotice,
+.emptyState {
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(7, 13, 19, 0.62);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.24);
+  backdrop-filter: blur(16px);
+}
+
+.titleBlock {
+  width: min(430px, 100%);
+  border-radius: 8px;
+  padding: 13px 14px;
+  pointer-events: auto;
+}
+
+.kicker,
+.panelKicker {
+  margin: 0 0 7px;
+  color: #93cde7;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.titleBlock h1,
+.infoPanel h2 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 1.18rem;
+  line-height: 1.14;
+}
+
+.titleBlock p,
+.infoPanel p {
+  margin: 10px 0 0;
+  color: rgba(244, 247, 251, 0.82);
+  line-height: 1.5;
+  font-size: 0.92rem;
+}
+
+.instructions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.instructions span {
+  min-height: 30px;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 999px;
+  padding: 5px 10px;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.76rem;
+  white-space: nowrap;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  border-radius: 8px;
+  padding: 7px;
+  pointer-events: auto;
+}
+
+.controls button,
+.sceneMenu button,
+.closeButton {
+  min-height: 44px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.controls button {
+  padding: 0 12px;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.controls button:hover,
+.controls button:focus-visible,
+.sceneMenu button:hover,
+.sceneMenu button:focus-visible,
+.closeButton:hover,
+.closeButton:focus-visible {
+  outline: none;
+  border-color: rgba(120, 215, 255, 0.82);
+  background: rgba(68, 164, 204, 0.24);
+}
+
+.controls button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.sceneMenu {
+  position: absolute;
+  z-index: 18;
+  left: 18px;
+  bottom: 18px;
+  width: 300px;
+  max-width: calc(100% - 36px);
+  max-height: calc(100vh - 180px);
+  display: grid;
+  gap: 8px;
+  overflow: auto;
+  border-radius: 8px;
+  padding: 8px;
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.sceneMenu button {
+  display: grid;
+  gap: 2px;
+  width: 100%;
+  padding: 9px 11px;
+  text-align: left;
+}
+
+.sceneMenu span {
+  color: #ffffff;
+  font-weight: 700;
+  line-height: 1.2;
+  font-size: 0.92rem;
+}
+
+.sceneMenu small {
+  color: rgba(244, 247, 251, 0.66);
+  line-height: 1.25;
+  font-size: 0.78rem;
+}
+
+.cleanView .topBar {
+  opacity: 0.18;
+  transform: translateY(-8px);
+}
+
+.cleanView .sceneMenu {
+  opacity: 0.12;
+  transform: translateY(12px);
+}
+
+.cleanView .topBar:hover,
+.cleanView .topBar:focus-within,
+.cleanView .sceneMenu:hover,
+.cleanView .sceneMenu:focus-within {
+  opacity: 1;
+  transform: none;
+}
+
+.sceneMenu .activeScene {
+  border-color: rgba(255, 209, 102, 0.9);
+  background: rgba(255, 209, 102, 0.15);
+}
+
+.infoPanel {
+  position: absolute;
+  z-index: 24;
+  right: 18px;
+  bottom: 18px;
+  width: min(380px, calc(100% - 36px));
+  border-radius: 8px;
+  padding: 18px;
+}
+
+.closeButton {
+  float: right;
+  padding: 0 12px;
+  margin-left: 12px;
+}
+
+.infoImage {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: 6px;
+  margin-bottom: 14px;
+  background: #172330;
+}
+
+.fallbackNotice {
+  position: absolute;
+  z-index: 19;
+  left: 50%;
+  top: 50%;
+  width: min(360px, calc(100% - 40px));
+  transform: translate(-50%, -50%);
+  border-radius: 8px;
+  padding: 12px 14px;
+  color: rgba(255, 255, 255, 0.88);
+  text-align: center;
+}
+
+.loading {
+  position: absolute;
+  z-index: 30;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 14px;
+  background: rgba(4, 8, 12, 0.76);
+  color: #ffffff;
+}
+
+.loading p {
+  margin: 0;
+  font-weight: 700;
+}
+
+.loader {
+  width: 44px;
+  height: 44px;
+  border: 3px solid rgba(255, 255, 255, 0.18);
+  border-top-color: #79d7ff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.emptyState {
+  position: absolute;
+  inset: 24px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  padding: 24px;
+  text-align: center;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (min-width: 900px) {
+  .sceneMenu {
+    top: 176px;
+    bottom: auto;
+  }
+}
+
+@media (max-width: 720px) {
+  .topBar {
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .titleBlock {
+    padding: 11px 12px;
+  }
+
+  .titleBlock h1,
+  .infoPanel h2 {
+    font-size: 1rem;
+  }
+
+  .titleBlock p {
+    display: none;
+  }
+
+  .instructions span {
+    min-height: 26px;
+    padding: 4px 8px;
+    font-size: 0.7rem;
+    white-space: normal;
+  }
+
+  .controls {
+    width: 100%;
+  }
+
+  .controls button {
+    flex: 1 1 115px;
+    min-height: 42px;
+    font-size: 0.82rem;
+  }
+
+  .sceneMenu {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    max-width: none;
+    max-height: none;
+    display: flex;
+    border-right: 0;
+    border-bottom: 0;
+    border-left: 0;
+    border-radius: 0;
+    overflow-x: auto;
+    padding: 8px 10px 10px;
+  }
+
+  .sceneMenu button {
+    min-width: 168px;
+  }
+
+  .infoPanel {
+    right: 12px;
+    bottom: 92px;
+    width: calc(100% - 24px);
+    max-height: 46vh;
+    overflow: auto;
+  }
+}
