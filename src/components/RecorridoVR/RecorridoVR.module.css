@@ -219,20 +219,29 @@
   background: rgba(255, 209, 102, 0.15);
 }
 
-.infoPanel {
+.infoOverlay {
   position: absolute;
-  z-index: 24;
-  right: 18px;
-  bottom: 18px;
-  width: min(380px, calc(100% - 36px));
+  z-index: 26;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  pointer-events: auto;
+  background: rgba(2, 6, 10, 0.34);
+}
+
+.infoPanel {
+  width: min(430px, 100%);
+  max-height: min(76vh, 620px);
+  overflow: auto;
   border-radius: 8px;
   padding: 18px;
 }
 
 .closeButton {
-  float: right;
+  display: block;
   padding: 0 12px;
-  margin-left: 12px;
+  margin: 0 0 12px auto;
 }
 
 .infoImage {
@@ -366,11 +375,13 @@
     min-width: 168px;
   }
 
+  .infoOverlay {
+    padding: 12px;
+    align-items: center;
+  }
+
   .infoPanel {
-    right: 12px;
-    bottom: 92px;
-    width: calc(100% - 24px);
-    max-height: 46vh;
-    overflow: auto;
+    width: 100%;
+    max-height: 68vh;
   }
 }

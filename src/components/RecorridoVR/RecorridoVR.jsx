@@ -32,9 +32,15 @@ function isUsableTour(data) {
   return data && Array.isArray(data.nodes) && data.nodes.length > 0;
 }
 
+function fitText(value, max = 145) {
+  if (!value) return "";
+  return value.length > max ? `${value.slice(0, max - 3).trim()}...` : value;
+}
+
 export default function RecorridoVR() {
   const containerRef = useRef(null);
   const sceneRef = useRef(null);
+  const vrCloseRef = useRef(null);
   const lastActivationRef = useRef({ id: "", time: 0 });
   const [aframeReady, setAframeReady] = useState(false);
   const [tour, setTour] = useState(null);
@@ -196,6 +202,19 @@ export default function RecorridoVR() {
     sceneRef.current?.enterVR?.();
   }, []);
 
+  useEffect(() => {
+    const el = vrCloseRef.current;
+    if (!el || !infoHotspot) return undefined;
+
+    const close = (event) => {
+      event.stopPropagation();
+      setInfoHotspot(null);
+    };
+
+    el.addEventListener("click", close);
+    return () => el.removeEventListener("click", close);
+  }, [infoHotspot]);
+
   if (notice && !currentNode) {
     return (
       <main className={styles.shell}>
@@ -256,6 +275,56 @@ export default function RecorridoVR() {
                   animation__fusing="property: scale; startEvents: fusing; easing: easeInQuad; dur: 1500; from: 1 1 1; to: 1.8 1.8 1.8"
                   animation__reset="property: scale; startEvents: mouseleave; dur: 120; to: 1 1 1"
                 />
+                {infoHotspot ? (
+                  <a-entity position="0 0 -2.05">
+                    <a-plane
+                      width="1.72"
+                      height="1"
+                      material="color: #071018; opacity: 0.88; transparent: true; shader: flat"
+                    />
+                    <a-text
+                      value="Punto informativo"
+                      align="center"
+                      width="1.45"
+                      color="#93cde7"
+                      position="0 0.35 0.02"
+                      material="shader: flat"
+                    />
+                    <a-text
+                      value={fitText(infoHotspot.title || infoHotspot.label, 38)}
+                      align="center"
+                      width="1.52"
+                      color="#ffffff"
+                      position="0 0.19 0.02"
+                      material="shader: flat"
+                    />
+                    <a-text
+                      value={fitText(infoHotspot.description, 120)}
+                      align="center"
+                      width="1.42"
+                      color="#dbeafe"
+                      position="0 -0.06 0.02"
+                      material="shader: flat"
+                    />
+                    <a-entity
+                      ref={vrCloseRef}
+                      className="hotspot"
+                      position="0 -0.36 0.04"
+                      geometry="primitive: circle; radius: 0.16"
+                      material="color: #38bdf8; opacity: 0.95; transparent: true; shader: flat"
+                      data-hotspot-id="cerrar-info-vr"
+                    >
+                      <a-text
+                        value="Cerrar"
+                        align="center"
+                        width="1"
+                        color="#071018"
+                        position="0 -0.025 0.01"
+                        material="shader: flat"
+                      />
+                    </a-entity>
+                  </a-entity>
+                ) : null}
               </a-camera>
             </a-entity>
           </a-scene>
