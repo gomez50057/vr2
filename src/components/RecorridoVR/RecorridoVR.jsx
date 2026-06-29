@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Hotspot from "./Hotspot";
-import ImmersiveStage from "./ImmersiveStage";
 import InfoPanel from "./InfoPanel";
 import LoadingScreen from "./LoadingScreen";
 import SceneMenu from "./SceneMenu";
@@ -207,7 +206,6 @@ export default function RecorridoVR() {
     );
   }
 
-  const panoramaAssetId = currentNode ? `panorama-${currentNode.id}` : "panorama";
   const skyRotation = `0 ${Number(currentNode?.initialRotation || 0)} 0`;
   const hotspots = Array.isArray(currentNode?.hotspots) ? currentNode.hotspots : [];
 
@@ -228,19 +226,15 @@ export default function RecorridoVR() {
             loading-screen="enabled: false"
             device-orientation-permission-ui="enabled: true"
           >
-            <a-assets timeout="5000">
-              {!imageBroken && currentNode.panorama ? (
-                <img id={panoramaAssetId} src={currentNode.panorama} alt="" />
-              ) : null}
-            </a-assets>
-
             {imageBroken ? (
-              <a-sky color="#152230" rotation={skyRotation} />
+              <a-sky key={`fallback-${currentNode.id}`} color="#152230" rotation={skyRotation} />
             ) : (
-              <a-sky src={`#${panoramaAssetId}`} rotation={skyRotation} />
+              <a-sky
+                key={`panorama-${currentNode.id}`}
+                src={currentNode.panorama}
+                rotation={skyRotation}
+              />
             )}
-
-            {currentNode.id !== "entrada" ? <ImmersiveStage node={currentNode} /> : null}
 
             {hotspots.map((hotspot) => (
               <Hotspot key={hotspot.id} hotspot={hotspot} onActivate={activateHotspot} />
