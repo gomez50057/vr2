@@ -40,6 +40,8 @@ export default function Hotspot({ hotspot, onActivate }) {
       className="hotspot"
       position={hotspot.position}
       face-camera=""
+      geometry="primitive: circle; radius: 0.52"
+      material="color: #ffffff; shader: flat; opacity: 0.001; transparent: true"
       data-hotspot-id={hotspot.id}
     >
       <a-light type="point" color={colors.glow} intensity="0.2" distance="2.4" />

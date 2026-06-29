@@ -38,6 +38,22 @@ const tour = JSON.parse(fs.readFileSync(path.join(root, "public", "vr", "data", 
     });
   }
 
+  await page.getByRole("button", { name: /Entrada torre de reloj/i }).click();
+  await page.waitForTimeout(500);
+
+  await page.locator('[data-hotspot-id="info-entrada"]').evaluate((el) => {
+    el.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
+  });
+  await page.waitForSelector('[role="dialog"]', { timeout: 5000 });
+  const infoTitle = await page.locator('[role="dialog"] h2').innerText();
+  await page.getByRole("button", { name: /Cerrar/i }).click();
+
+  await page.locator('[data-hotspot-id="ir-plaza-civica"]').evaluate((el) => {
+    el.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
+  });
+  await page.waitForTimeout(900);
+  const hotspotNavigationTitle = await page.locator("h1").innerText();
+
   await page.screenshot({
     path: path.join(outDir, "recorrido-vr-7-vistas.png"),
     fullPage: true,
@@ -45,7 +61,9 @@ const tour = JSON.parse(fs.readFileSync(path.join(root, "public", "vr", "data", 
 
   await browser.close();
 
-  console.log(JSON.stringify({ consoleErrors, results }, null, 2));
+  console.log(JSON.stringify({ consoleErrors, results, infoTitle, hotspotNavigationTitle }, null, 2));
   if (consoleErrors.length) process.exit(1);
   if (results.some((result) => !result.skyUsesAsset)) process.exit(1);
+  if (!/Acceso urbano/i.test(infoTitle)) process.exit(1);
+  if (!/Plaza civica/i.test(hotspotNavigationTitle)) process.exit(1);
 })();
