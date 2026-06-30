@@ -20,6 +20,10 @@ export default function Hotspot({ hotspot, onActivate }) {
   const colors = COLORS[hotspot.type] || COLORS.info;
   const label =
     hotspot.label.length > 20 ? `${hotspot.label.slice(0, 18).trim()}...` : hotspot.label;
+  const iconY = hotspot.type === "info" ? 0.58 : 0;
+  const labelY = hotspot.type === "info" ? 1.18 : -0.74;
+  const textY = labelY - 0.035;
+  const hitRadius = hotspot.type === "info" ? 1.08 : 0.68;
 
   useEffect(() => {
     const el = ref.current;
@@ -29,9 +33,23 @@ export default function Hotspot({ hotspot, onActivate }) {
       event.stopPropagation();
       onActivate(hotspot);
     };
+    const highlight = () => {
+      el.setAttribute("scale", "1.14 1.14 1.14");
+      el.querySelector("a-light")?.setAttribute("intensity", "0.55");
+    };
+    const reset = () => {
+      el.setAttribute("scale", "1 1 1");
+      el.querySelector("a-light")?.setAttribute("intensity", "0.2");
+    };
 
     el.addEventListener("click", activate);
-    return () => el.removeEventListener("click", activate);
+    el.addEventListener("mouseenter", highlight);
+    el.addEventListener("mouseleave", reset);
+    return () => {
+      el.removeEventListener("click", activate);
+      el.removeEventListener("mouseenter", highlight);
+      el.removeEventListener("mouseleave", reset);
+    };
   }, [hotspot, onActivate]);
 
   return (
@@ -40,25 +58,34 @@ export default function Hotspot({ hotspot, onActivate }) {
       className="hotspot"
       position={hotspot.position}
       face-camera=""
-      geometry="primitive: circle; radius: 0.52"
+      geometry={`primitive: circle; radius: ${hitRadius}`}
       material="color: #ffffff; shader: flat; opacity: 0.001; transparent: true"
       data-hotspot-id={hotspot.id}
     >
-      <a-light type="point" color={colors.glow} intensity="0.2" distance="2.4" />
+      <a-light
+        type="point"
+        color={colors.glow}
+        intensity="0.2"
+        distance="2.4"
+        position={`0 ${iconY} 0`}
+      />
       <a-circle
         radius="0.2"
+        position={`0 ${iconY} 0`}
         material={`color: ${colors.fill}; shader: flat; opacity: 0.95; transparent: true`}
         animation__pulse="property: scale; dir: alternate; dur: 980; easing: easeInOutSine; loop: true; to: 1.08 1.08 1.08"
       />
       <a-torus
         radius="0.27"
         radius-tubular="0.012"
+        position={`0 ${iconY} 0`}
         material={`color: ${colors.glow}; opacity: 0.88; transparent: true; shader: flat`}
         animation__spin="property: rotation; to: 0 0 360; dur: 4600; easing: linear; loop: true"
       />
       <a-ring
         radius-inner="0.35"
         radius-outer="0.38"
+        position={`0 ${iconY} 0`}
         material={`color: ${colors.ring}; shader: flat; opacity: 0.46; transparent: true`}
       />
       {hotspot.type === "navigation" ? (
@@ -76,22 +103,24 @@ export default function Hotspot({ hotspot, onActivate }) {
           align="center"
           width="1.2"
           color="#17202a"
-          position="0 -0.07 0.04"
+          position={`0 ${iconY - 0.07} 0.04`}
           material="shader: flat"
         />
       )}
       <a-plane
-        width="1.55"
-        height="0.28"
-        position="0 -0.5 -0.02"
+        width="1.42"
+        height="0.24"
+        position={`0 ${labelY} -0.02`}
         material="color: #071018; opacity: 0.76; transparent: true; shader: flat"
       />
       <a-text
         value={label}
         align="center"
-        width="2.6"
+        baseline="center"
+        anchor="center"
+        width="2.35"
         color="#f7fbff"
-        position="0 -0.57 0.03"
+        position={`0 ${textY} 0.03`}
         material="shader: flat"
       />
     </a-entity>

@@ -9,6 +9,26 @@ import styles from "./RecorridoVR.module.css";
 
 const TOUR_URL = "/vr/data/tour.json";
 const GAZE_MS = 1500;
+const SCENE_FADE_MS = 260;
+
+function preloadPanorama(src) {
+  if (!src) return Promise.resolve(false);
+
+  return new Promise((resolve) => {
+    let done = false;
+    const image = new Image();
+    const finish = (loaded) => {
+      if (done) return;
+      done = true;
+      window.clearTimeout(timeout);
+      resolve(loaded);
+    };
+    const timeout = window.setTimeout(() => finish(false), 1800);
+    image.onload = () => finish(true);
+    image.onerror = () => finish(false);
+    image.src = src;
+  });
+}
 
 function registerFaceCamera() {
   const aframe = window.AFRAME;
@@ -69,6 +89,9 @@ export default function RecorridoVR() {
   const sceneRef = useRef(null);
   const audioRef = useRef(null);
   const vrCloseRef = useRef(null);
+  const clickAudioRef = useRef(null);
+  const transitionTimerRef = useRef(null);
+  const changingSceneRef = useRef(false);
   const lastActivationRef = useRef({ id: "", time: 0 });
   const [aframeReady, setAframeReady] = useState(false);
   const [tour, setTour] = useState(null);
@@ -80,6 +103,7 @@ export default function RecorridoVR() {
   const [cleanView, setCleanView] = useState(false);
   const [isVrMode, setIsVrMode] = useState(false);
   const [audioEnabled, setAudioEnabled] = useState(false);
+  const [transitionName, setTransitionName] = useState("");
 
   useEffect(() => {
     let mounted = true;
@@ -165,6 +189,26 @@ export default function RecorridoVR() {
     setAudioEnabled(false);
   }, [playAudio]);
 
+  const playClick = useCallback(() => {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return;
+
+    const context = clickAudioRef.current || new AudioContext();
+    clickAudioRef.current = context;
+    context.resume?.();
+    const oscillator = context.createOscillator();
+    const gain = context.createGain();
+    oscillator.type = "sine";
+    oscillator.frequency.value = 660;
+    gain.gain.setValueAtTime(0.0001, context.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.08, context.currentTime + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.0001, context.currentTime + 0.08);
+    oscillator.connect(gain);
+    gain.connect(context.destination);
+    oscillator.start();
+    oscillator.stop(context.currentTime + 0.09);
+  }, []);
+
   useEffect(() => {
     closeInfo();
   }, [currentNodeId, closeInfo]);
@@ -218,9 +262,25 @@ export default function RecorridoVR() {
   }, [currentNode]);
 
   const changeScene = useCallback(
-    (nodeId) => {
-      if (!nodeId || !nodesById[nodeId] || nodeId === currentNodeId) return;
+    async (nodeId) => {
+      const nextNode = nodesById[nodeId];
+      if (!nextNode || nodeId === currentNodeId || changingSceneRef.current) return;
+
+      changingSceneRef.current = true;
+      window.clearTimeout(transitionTimerRef.current);
+      setTransitionName(`Entrando a ${nextNode.title}`);
+      setLoading(true);
+      await Promise.all([
+        preloadPanorama(nextNode.panorama),
+        new Promise((resolve) => window.setTimeout(resolve, SCENE_FADE_MS)),
+      ]);
       setCurrentNodeId(nodeId);
+      window.setTimeout(() => {
+        changingSceneRef.current = false;
+      }, SCENE_FADE_MS);
+      transitionTimerRef.current = window.setTimeout(() => {
+        setTransitionName("");
+      }, 1800);
     },
     [currentNodeId, nodesById],
   );
@@ -236,6 +296,7 @@ export default function RecorridoVR() {
       }
 
       lastActivationRef.current = { id: hotspot.id, time: now };
+      playClick();
 
       if (hotspot.type === "navigation") {
         changeScene(hotspot.target);
@@ -244,7 +305,7 @@ export default function RecorridoVR() {
 
       setInfoHotspot(hotspot);
     },
-    [changeScene],
+    [changeScene, playClick],
   );
 
   const toggleFullscreen = useCallback(() => {
@@ -282,6 +343,13 @@ export default function RecorridoVR() {
   useEffect(() => {
     if (isVrMode) playAudio();
   }, [isVrMode, playAudio]);
+
+  useEffect(() => {
+    return () => {
+      window.clearTimeout(transitionTimerRef.current);
+      clickAudioRef.current?.close?.();
+    };
+  }, []);
 
   useEffect(() => {
     const el = vrCloseRef.current;
@@ -450,6 +518,8 @@ export default function RecorridoVR() {
           Panorama no disponible. Mostrando fondo de respaldo.
         </div>
       ) : null}
+
+      {transitionName ? <div className={styles.transitionName}>{transitionName}</div> : null}
 
       {currentNode ? (
         <SceneMenu nodes={nodes} currentNodeId={currentNode.id} onSelect={changeScene} />

@@ -267,6 +267,23 @@
   text-align: center;
 }
 
+.transitionName {
+  position: absolute;
+  z-index: 29;
+  left: 50%;
+  top: 50%;
+  width: min(360px, calc(100% - 40px));
+  transform: translate(-50%, -50%);
+  border-radius: 8px;
+  padding: 14px 16px;
+  background: rgba(0, 0, 0, 0.78);
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 800;
+  text-align: center;
+  pointer-events: none;
+}
+
 .loading {
   position: absolute;
   z-index: 30;
@@ -275,8 +292,16 @@
   place-items: center;
   align-content: center;
   gap: 14px;
-  background: rgba(4, 8, 12, 0.76);
+  background: #000000;
   color: #ffffff;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 260ms ease;
+}
+
+.loadingVisible {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .loading p {
@@ -306,13 +331,6 @@
 @keyframes spin {
   to {
     transform: rotate(360deg);
-  }
-}
-
-@media (min-width: 900px) {
-  .sceneMenu {
-    top: 176px;
-    bottom: auto;
   }
 }
 

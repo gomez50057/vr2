@@ -113,3 +113,6 @@
  GET /recorrido-vr 200 in 106ms (next.js: 9ms, application-code: 97ms)
 ✓ Compiled in 82ms
  GET /recorrido-vr 200 in 235ms (next.js: 164ms, application-code: 71ms)
+✓ Compiled in 120ms
+ GET /recorrido-vr 200 in 297ms (next.js: 218ms, application-code: 78ms)
+ GET /recorrido-vr 200 in 184ms (next.js: 5ms, application-code: 179ms)
