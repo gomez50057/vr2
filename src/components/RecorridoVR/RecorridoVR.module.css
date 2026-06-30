@@ -34,6 +34,10 @@
   display: block;
 }
 
+.viewer :global(.hotspotButton) {
+  cursor: pointer;
+}
+
 .viewer :global(.a-enter-vr),
 .viewer :global(.a-enter-ar) {
   display: none;
@@ -296,7 +300,7 @@
   color: #ffffff;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 260ms ease;
+  transition: opacity 2300ms ease;
 }
 
 .loadingVisible {

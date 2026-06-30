@@ -9,7 +9,7 @@ import styles from "./RecorridoVR.module.css";
 
 const TOUR_URL = "/vr/data/tour.json";
 const GAZE_MS = 1500;
-const SCENE_FADE_MS = 380;
+const SCENE_FADE_MS = 2300;
 
 function preloadPanorama(src) {
   if (!src) return Promise.resolve(false);
@@ -219,7 +219,7 @@ export default function RecorridoVR() {
     let alive = true;
     let done = false;
     const started = Date.now();
-    const minTransitionMs = 620;
+    const minTransitionMs = SCENE_FADE_MS;
 
     setLoading(true);
     setImageBroken(false);
@@ -280,7 +280,7 @@ export default function RecorridoVR() {
       }, SCENE_FADE_MS);
       transitionTimerRef.current = window.setTimeout(() => {
         setTransitionName("");
-      }, 1800);
+      }, SCENE_FADE_MS);
     },
     [currentNodeId, nodesById],
   );

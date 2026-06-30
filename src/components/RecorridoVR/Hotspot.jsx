@@ -57,6 +57,7 @@ export default function Hotspot({ hotspot, onActivate }) {
   return (
     <a-entity
       ref={rootRef}
+      className="hotspotButton"
       position={hotspot.position}
       face-camera=""
       data-hotspot-id={hotspot.id}
@@ -65,8 +66,8 @@ export default function Hotspot({ hotspot, onActivate }) {
         ref={hitRef}
         className="hotspot"
         radius={String(hitRadius)}
-        position={`0 ${iconY} 0.08`}
-        material="color: #ffffff; shader: flat; opacity: 0.001; transparent: true"
+        position={`0 ${iconY} 0.01`}
+        material="color: #ffffff; shader: flat; opacity: 0.001; transparent: true; depthWrite: false"
       />
       <a-light
         type="point"
@@ -77,21 +78,21 @@ export default function Hotspot({ hotspot, onActivate }) {
       />
       <a-circle
         radius="0.2"
-        position={`0 ${iconY} 0`}
+        position={`0 ${iconY} 0.08`}
         material={`color: ${colors.fill}; shader: flat; opacity: 0.95; transparent: true`}
         animation__pulse="property: scale; dir: alternate; dur: 980; easing: easeInOutSine; loop: true; to: 1.08 1.08 1.08"
       />
       <a-torus
         radius="0.27"
         radius-tubular="0.012"
-        position={`0 ${iconY} 0`}
+        position={`0 ${iconY} 0.09`}
         material={`color: ${colors.glow}; opacity: 0.88; transparent: true; shader: flat`}
         animation__spin="property: rotation; to: 0 0 360; dur: 4600; easing: linear; loop: true"
       />
       <a-ring
         radius-inner="0.35"
         radius-outer="0.38"
-        position={`0 ${iconY} 0`}
+        position={`0 ${iconY} 0.1`}
         material={`color: ${colors.ring}; shader: flat; opacity: 0.46; transparent: true`}
       />
       {hotspot.type === "navigation" ? (
@@ -99,7 +100,7 @@ export default function Hotspot({ hotspot, onActivate }) {
           radius-bottom="0.085"
           radius-top="0"
           height="0.22"
-          position="0.03 0 0.03"
+          position="0.03 0 0.14"
           rotation="0 0 -90"
           material="color: #ffffff; shader: flat; opacity: 0.95; transparent: true"
         />
@@ -109,7 +110,7 @@ export default function Hotspot({ hotspot, onActivate }) {
           align="center"
           width="1.2"
           color="#17202a"
-          position={`0 ${iconY - 0.07} 0.04`}
+          position={`0 ${iconY - 0.07} 0.14`}
           material="shader: flat"
         />
       )}
