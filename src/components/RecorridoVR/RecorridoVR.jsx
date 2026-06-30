@@ -9,7 +9,7 @@ import styles from "./RecorridoVR.module.css";
 
 const TOUR_URL = "/vr/data/tour.json";
 const GAZE_MS = 1500;
-const SCENE_FADE_MS = 260;
+const SCENE_FADE_MS = 380;
 
 function preloadPanorama(src) {
   if (!src) return Promise.resolve(false);
@@ -219,7 +219,7 @@ export default function RecorridoVR() {
     let alive = true;
     let done = false;
     const started = Date.now();
-    const minTransitionMs = 320;
+    const minTransitionMs = 620;
 
     setLoading(true);
     setImageBroken(false);
@@ -390,7 +390,7 @@ export default function RecorridoVR() {
             ref={sceneRef}
             className={styles.scene}
             embedded
-            renderer="antialias: true; colorManagement: true; physicallyCorrectLights: true; sortObjects: true; precision: high"
+            renderer="antialias: true; colorManagement: true; physicallyCorrectLights: true; sortObjects: true; precision: high; clearColor: #000000"
             vr-mode-ui="enabled: false"
             loading-screen="enabled: false"
             device-orientation-permission-ui="enabled: true"

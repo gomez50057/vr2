@@ -16,52 +16,58 @@ const COLORS = {
 };
 
 export default function Hotspot({ hotspot, onActivate }) {
-  const ref = useRef(null);
+  const rootRef = useRef(null);
+  const hitRef = useRef(null);
   const colors = COLORS[hotspot.type] || COLORS.info;
   const label =
     hotspot.label.length > 20 ? `${hotspot.label.slice(0, 18).trim()}...` : hotspot.label;
   const iconY = hotspot.type === "info" ? 0.58 : 0;
   const labelY = hotspot.type === "info" ? 1.18 : -0.74;
   const textY = labelY - 0.035;
-  const hitRadius = hotspot.type === "info" ? 1.08 : 0.68;
+  const hitRadius = hotspot.type === "info" ? 0.42 : 0.48;
 
   useEffect(() => {
-    const el = ref.current;
-    if (!el) return undefined;
+    const hit = hitRef.current;
+    const root = rootRef.current;
+    if (!hit || !root) return undefined;
 
     const activate = (event) => {
       event.stopPropagation();
       onActivate(hotspot);
     };
     const highlight = () => {
-      el.setAttribute("scale", "1.14 1.14 1.14");
-      el.querySelector("a-light")?.setAttribute("intensity", "0.55");
+      root.setAttribute("scale", "1.14 1.14 1.14");
+      root.querySelector("a-light")?.setAttribute("intensity", "0.55");
     };
     const reset = () => {
-      el.setAttribute("scale", "1 1 1");
-      el.querySelector("a-light")?.setAttribute("intensity", "0.2");
+      root.setAttribute("scale", "1 1 1");
+      root.querySelector("a-light")?.setAttribute("intensity", "0.2");
     };
 
-    el.addEventListener("click", activate);
-    el.addEventListener("mouseenter", highlight);
-    el.addEventListener("mouseleave", reset);
+    hit.addEventListener("click", activate);
+    hit.addEventListener("mouseenter", highlight);
+    hit.addEventListener("mouseleave", reset);
     return () => {
-      el.removeEventListener("click", activate);
-      el.removeEventListener("mouseenter", highlight);
-      el.removeEventListener("mouseleave", reset);
+      hit.removeEventListener("click", activate);
+      hit.removeEventListener("mouseenter", highlight);
+      hit.removeEventListener("mouseleave", reset);
     };
   }, [hotspot, onActivate]);
 
   return (
     <a-entity
-      ref={ref}
-      className="hotspot"
+      ref={rootRef}
       position={hotspot.position}
       face-camera=""
-      geometry={`primitive: circle; radius: ${hitRadius}`}
-      material="color: #ffffff; shader: flat; opacity: 0.001; transparent: true"
       data-hotspot-id={hotspot.id}
     >
+      <a-circle
+        ref={hitRef}
+        className="hotspot"
+        radius={String(hitRadius)}
+        position={`0 ${iconY} 0.08`}
+        material="color: #ffffff; shader: flat; opacity: 0.001; transparent: true"
+      />
       <a-light
         type="point"
         color={colors.glow}
